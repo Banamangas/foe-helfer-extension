@@ -1,0 +1,132 @@
+/*
+ * **************************************************************************************
+ * Copyright (C) 2026 FoE-Helper team - All Rights Reserved
+ * You may use, distribute and modify this code under the
+ * terms of the AGPL license.
+ *
+ * See file LICENSE.md or go to
+ * https://github.com/mainIine/foe-helfer-extension/blob/master/LICENSE.md
+ * for full license details.
+ *
+ * **************************************************************************************
+ */
+
+#building-tracker {
+	position: fixed;
+	top: 40px;
+	right: 70px;
+	z-index: 999;
+	background: rgba(30, 30, 40, 0.92);
+	border: 1px solid #8c6b3f;
+	border-radius: 4px;
+	padding: 6px 10px;
+	color: #e0d0b0;
+	font-size: 12px;
+	min-width: 180px;
+	max-width: 280px;
+	font-family: sans-serif;
+	line-height: 1.4;
+}
+
+#building-tracker.bt-hidden {
+	display: none !important;
+}
+
+.bt-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	border-bottom: 1px solid #8c6b3f;
+	padding-bottom: 4px;
+	margin-bottom: 6px;
+}
+
+.bt-title {
+	font-weight: bold;
+	font-size: 13px;
+	color: #f0e0c0;
+}
+
+.bt-diamond-badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 26px;
+	height: 26px;
+	border: 2px solid #cc3333;
+	border-radius: 4px;
+	background: rgba(0, 0, 0, 0.5);
+	position: relative;
+	cursor: pointer;
+}
+
+.bt-diamond-badge.active {
+	border-color: #33cc33;
+}
+
+.bt-diamond-badge img {
+	width: 18px;
+	height: 18px;
+}
+
+.bt-diamond-badge .bt-count {
+	position: absolute;
+	top: -7px;
+	right: -7px;
+	background: #cc3333;
+	color: white;
+	font-size: 10px;
+	font-weight: bold;
+	padding: 0 4px;
+	border-radius: 8px;
+	min-width: 14px;
+	text-align: center;
+	line-height: 14px;
+}
+
+.bt-diamond-badge.active .bt-count {
+	background: #33cc33;
+}
+
+.bt-body {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.bt-section {
+	display: flex;
+	justify-content: space-around;
+	gap: 8px;
+}
+
+.bt-gb-item,
+.bt-building-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	min-width: 40px;
+}
+
+.bt-icon {
+	width: 32px;
+	height: 32px;
+	object-fit: contain;
+	background: rgba(0, 0, 0, 0.3);
+	border-radius: 3px;
+	padding: 2px;
+}
+
+.bt-gb-lvl {
+	font-size: 14px;
+	margin-top: 2px;
+	color: #f0e0c0;
+	font-weight: bold;
+}
+
+.bt-building-count {
+	font-size: 14px;
+	margin-top: 2px;
+	color: #e0d0b0;
+	font-weight: bold;
+}

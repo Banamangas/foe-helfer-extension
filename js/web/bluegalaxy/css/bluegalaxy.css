@@ -102,6 +102,10 @@
     background-position: 0 3px;
 }
 
+#bluegalaxy table th.icon.premium span::before  {
+    background-position: -209px 3px;
+}
+
 #bluegalaxy #bluegalaxyBody td {
     position: relative;
     font-size: 95%;

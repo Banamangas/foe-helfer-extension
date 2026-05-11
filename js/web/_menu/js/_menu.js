@@ -65,6 +65,7 @@ let _menu = {
 		'playerProfile',
 		'unit',
 		'shopAssist',
+		'buildingTracker',
 		'allies',
 	],
 	HiddenItems: [],
@@ -315,6 +316,7 @@ let _menu = {
 		{ id: 'guildMemberstat', title: i18n('Menu.GuildMemberStat.Title'), description: i18n('Menu.GuildMemberStat.Desc'), warning: '<em id="guildmemberstat-Btn-closed" class="tooltip-error">' + i18n('Menu.GuildMemberStat.Warning') + '<br></em>' },
 		{ id: 'gildFight', title: i18n('Menu.Gildfight.Title'), description: i18n('Menu.Gildfight.Desc'), warning: i18n('Menu.Gildfight.Warning') },
 		{ id: 'market', title: i18n('Menu.Market.Title'), description: i18n('Menu.Market.Desc'), warning: '<em id="market-Btn-closed" class="tooltip-error">' + i18n('Menu.Market.Warning') + '<br></em>' },
+		{ id: 'buildingTracker', title: i18n('Menu.BuildingTracker.Title'), description: i18n('Menu.BuildingTracker.Desc') },
 		{ id: 'allies', title: i18n('Menu.Allies.Title'), description: i18n('Menu.Allies.Desc') },
 		{ id: 'productions', title: i18n('Menu.Productions.Title'), description: i18n('Menu.Productions.Desc') },
 		{ id: 'minigame_aztecs', title: i18n('Menu.AztecMiniGame.Title'), description: i18n('Menu.AztecMiniGame.Desc') },
@@ -419,7 +421,8 @@ let _menu = {
 		if (shopAssist.storeId !== null) 
 			red = false;
 
-		let btn = _menu.MakeButton('shopAssist', red);
+		let btn = _menu.MakeButton('shopAssist',
+		'buildingTracker', red);
 
 		let btnEl = $('<span />').bind('click', function () {
 			if (shopAssist.storeId !== null) {
@@ -850,6 +853,16 @@ let _menu = {
 		});
 
 		return btn.append(btn_sp);
+	},
+
+	buildingTracker_Btn: () => {
+		let btn = _menu.MakeButton('buildingTracker');
+
+		let btn_sp = $('<span />').bind('click', function () {
+			BuildingTracker.toggle();
+		});
+
+		return btn.append(btn_sp, $('<span id="building-tracker-count" class="hud-counter">0</span>'));
 	},
 
 	musicControl_Btn: () => {

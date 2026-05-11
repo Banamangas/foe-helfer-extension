@@ -1719,6 +1719,12 @@
     "Settings.Version.World": "World:",
     "Settings.doubleFPtimeout.Desc": "Shows a box that temporarily covers the FP entry field in GB after a donation. The value determines the duration the box is shown in seconds - when 0, the box does not show",
     "Settings.doubleFPtimeout.Title": "Double donation blocker",
+    "Menu.BuildingTracker.Title": "Building Tracker",
+    "Menu.BuildingTracker.Desc": "Shows tracked GB levels, building counts, and diamond production status",
+    "Boxes.BuildingTracker.Title": "Tracker",
+    "Boxes.BuildingTracker.City": "City",
+    "Boxes.BuildingTracker.Inventory": "Inventory",
+    "Boxes.BuildingTracker.Level": "Lv.",
     "StrategyPoints.BuyableFP": "FoE-Helper: Number of FPs that can be bought with coins.",
     "StrategyPoints.FPInBar": "FoE-Helper: Number of FPs in your bar.",
     "_Language": "English"
