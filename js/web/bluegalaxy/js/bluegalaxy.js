@@ -153,6 +153,7 @@ let BlueGalaxy = {
                 let GoodsSum = 0;
                 let OlderGoodsSum = 0;
                 let GuildGoodsSum = 0;
+                let Premium = 0;
                 let Fragments = [];
                 let FragmentAmount = 0;
                                
@@ -188,32 +189,37 @@ let BlueGalaxy = {
                         Fragments.push(product.resources);
                         FragmentAmount += product.resources.amount;
                     }
-                    
+
+                    if (product.type == "resources" && product.resources?.premium) {
+                        Premium += product.resources.premium;
+                    }
+
                    
                 });
 
-                if (GoodsSum > 0 || FP > 0 || FragmentAmount > 0 || OlderGoodsSum > 0) {  
-                    
+                if (GoodsSum > 0 || FP > 0 || FragmentAmount > 0 || OlderGoodsSum > 0 || Premium > 0) {
+
                     Buildings.push({
                         building: CityEntity,
-                        ID: CityEntity.id, 
+                        ID: CityEntity.id,
                         EntityID: CityEntity.entityId,
                         name: MainParser.CityBuildingsData[CityEntity.id].name,
-                        Fragments: Fragments, 
+                        Fragments: Fragments,
                         FragmentAmount: FragmentAmount,
-                        FP: FP, 
+                        FP: FP,
                         Goods: GoodsSum,
                         OlderGoods: OlderGoodsSum,
-                        GuildGoods: GuildGoodsSum, 
-                        In: CityEntity.state.times.in, 
-                        At: CityEntity.state.times.at, 
+                        GuildGoods: GuildGoodsSum,
+                        Premium: Premium,
+                        In: CityEntity.state.times.in,
+                        At: CityEntity.state.times.at,
                         CombinedValue: FP + BlueGalaxy.GoodsValue*GoodsSum + BlueGalaxy.OlderGoodsValue*OlderGoodsSum,
                     });
                 }
             }
         }
         if (BlueGalaxy.DoubleCollections > 0)
-            Buildings = Buildings.filter(obj => ((obj['FP'] > 0 || obj['Goods'] > 0 || obj['GuildGoods']>0 || obj['FragmentAmount']>0) && obj['In'] < 23.5 * 3600)); // Hide everything above 23h
+            Buildings = Buildings.filter(obj => ((obj['FP'] > 0 || obj['Goods'] > 0 || obj['GuildGoods']>0 || obj['FragmentAmount']>0 || obj['Premium']>0) && obj['In'] < 23.5 * 3600)); // Hide everything above 23h
 
         Buildings = Buildings.sort(function (a, b) {
             if (BlueGalaxy.sort.col) {
@@ -261,6 +267,7 @@ let BlueGalaxy = {
             '<th class="is-number icon old_goods ' + (BlueGalaxy.sort.col=="OlderGoods" ? BlueGalaxy.sort.order : "") + '" title="' + i18n('Boxes.BlueGalaxy.OlderGoods') + '" data-type="bg-group" data-colname="OlderGoods"><span></span></th>' +
             '<th class="is-number icon goods ' + (BlueGalaxy.sort.col=="Goods" ? BlueGalaxy.sort.order : "") + '" title="' + i18n('Boxes.BlueGalaxy.Goods') + '" data-type="bg-group" data-colname="Goods"><span></span></th>' +
             '<th class="is-number icon guildgoods ' + (BlueGalaxy.sort.col=="GuildGoods" ? BlueGalaxy.sort.order : "") + '" title="' + i18n('Boxes.GuildMemberStat.GuildGoods') + '" data-type="bg-group" data-colname="GuildGoods"><span></span></th>' +
+            '<th class="is-number icon premium ' + (BlueGalaxy.sort.col=="Premium" ? BlueGalaxy.sort.order : "") + '" title="Diamonds" data-type="bg-group" data-colname="Premium"><span></span></th>' +
             //'<th class="is-number icon fp ' + (BlueGalaxy.sort.col=="CombinedValue" ? BlueGalaxy.sort.order : "") + '" title="' + i18n('Boxes.GuildMemberStat.GuildGoods') + '" data-type="bg-group" data-colname="CombinedValue"><span></span></th>' +
             '<th colspan="2" class="case-sensitive no-sort" data-type="bg-group">' + i18n('Boxes.BlueGalaxy.DoneIn') + '</th>' +
             '</tr>' +
@@ -281,6 +288,7 @@ let BlueGalaxy = {
             table.push('<td class="text-center" data-number="'+Buildings[i].OlderGoods+'">' + HTML.Format(Buildings[i]['OlderGoods']) + '</td>');
             table.push('<td class="text-center" data-number="'+Buildings[i].Goods+'">' + HTML.Format(Buildings[i]['Goods']) + '</td>');
             table.push('<td class="text-center" data-number="'+Buildings[i].GuildGoods+'">' + HTML.Format(Buildings[i]['GuildGoods']) + '</td>');
+            table.push('<td class="text-center" data-number="'+Buildings[i].Premium+'">' + HTML.Format(Buildings[i]['Premium']) + '</td>');
             //table.push('<td class="text-center" data-number="'+Buildings[i].CombinedValue+'">' + HTML.Format(Buildings[i]['CombinedValue']) + '</td>');
 
             if (Buildings[i].In == 0 || Buildings[i].At * 1000 <= MainParser.getCurrentDateTime()) {
