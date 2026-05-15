@@ -106,7 +106,6 @@ let GuildFights = {
 	NewAction: null,
 	NewActionTimestamp: null,
 	MapData: null,
-	Neighbours: [],
 	PlayersPortraits: null,
 	Colors: null,
 	SortedColors: null,
@@ -189,13 +188,11 @@ let GuildFights = {
 
 	HandlePlayerLeaderboard: async (d) => {
 		// immer zwei vorhalten, für Referenz Daten (LiveUpdate)
-		if (localStorage.getItem('GuildFights.NewAction') !== null)
-		{
+		if (localStorage.getItem('GuildFights.NewAction') !== null) {
 			GuildFights.PrevAction = JSON.parse(localStorage.getItem('GuildFights.NewAction'));
 			GuildFights.PrevActionTimestamp = parseInt(localStorage.getItem('GuildFights.NewActionTimestamp'));
 		}
-		else if (GuildFights.NewAction !== null)
-		{
+		else if (GuildFights.NewAction !== null) {
 			GuildFights.PrevAction = GuildFights.NewAction;
 			GuildFights.PrevActionTimestamp = GuildFights.NewActionTimestamp;
 		}
@@ -205,13 +202,10 @@ let GuildFights = {
 		let sumBattles = 0;
 		let sumAttrition = 0;
 
-		for (let i in d)
-		{
+		for (let i in d) {
 
-			if (!d.hasOwnProperty(i))
-			{
-				break;
-			}
+			if (!d.hasOwnProperty(i)) break;
+
 			sumNegotiations += d[i]['negotiationsWon'] || 0;
 			sumBattles += d[i]['battlesWon'] || 0;
 			sumAttrition += d[i]['attrition'] || 0;
@@ -237,12 +231,10 @@ let GuildFights = {
 		GuildFights.NewActionTimestamp = moment().unix();
 		localStorage.setItem('GuildFights.NewActionTimestamp', GuildFights.NewActionTimestamp);
 
-		if ($('#GildPlayers').length > 0)
-		{
+		if ($('#GildPlayers').length > 0) {
 			GuildFights.BuildPlayerContent(GuildFights.CurrentGBGRound);
 		}
-		else
-		{
+		else {
 			GuildFights.ShowPlayerBox();
 		}
 	},
@@ -272,14 +264,12 @@ let GuildFights = {
 				})
 				.first();
 
-			if (CurrentSnapshot === undefined)
-			{
+			if (CurrentSnapshot === undefined) {
 				battles = data.battles;
 				negotiations = data.negotiations;
 				attrition = data.attrition;
 			}
-			else
-			{
+			else {
 				battles = data.diffbat;
 				negotiations = data.diffneg;
 				attrition = data.diffattr;
@@ -309,8 +299,7 @@ let GuildFights = {
 		GuildFights.PlayerBoxSettings.showLogButton = (PlayerBoxSettings.showLogButton !== undefined) ? PlayerBoxSettings.showLogButton : GuildFights.PlayerBoxSettings.showLogButton;
 		GuildFights.PlayerBoxSettings.showProgressFilter = (PlayerBoxSettings.showProgressFilter !== undefined) ? PlayerBoxSettings.showProgressFilter : GuildFights.PlayerBoxSettings.showProgressFilter;
 
-		if (GuildFights.GBGAllRounds === undefined || GuildFights.GBGAllRounds === null)
-		{
+		if (GuildFights.GBGAllRounds === undefined || GuildFights.GBGAllRounds === null) {
 			// get all available GBG entires
 			const gbgRounds = await GuildFights.db.history.where('gbground').above(0).keys();
 			gbgRounds.sort(function (a, b) { return b - a });
@@ -319,21 +308,18 @@ let GuildFights = {
 		}
 
 		//set latest GBG round to show if available and no specific GBG round is set
-		if (!gbground && GuildFights.GBGAllRounds && GuildFights.GBGAllRounds.length)
-		{
+		if (!gbground && GuildFights.GBGAllRounds && GuildFights.GBGAllRounds.length) {
 			gbground = GuildFights.GBGAllRounds[i];
 		}
 
-		if (gbground && GuildFights.GBGAllRounds && GuildFights.GBGAllRounds.length)
-		{
+		if (gbground && GuildFights.GBGAllRounds && GuildFights.GBGAllRounds.length) {
 			let index = GuildFights.GBGAllRounds.indexOf(gbground);
 			let previousweek = GuildFights.GBGAllRounds[index + 1] || null;
 			let nextweek = GuildFights.GBGAllRounds[index - 1] || null;
 
 			h.push(`<div id="gbg_roundswitch" class="roundswitch dark-bg">`);
 
-			if (GuildFights.PlayerBoxSettings.showRoundSelector)
-			{
+			if (GuildFights.PlayerBoxSettings.showRoundSelector) {
 				h.push(`${i18n('Boxes.GuildMemberStat.GBFRound')} <button class="btn btn-set-week" data-week="${previousweek}"${previousweek === null ? ' disabled' : ''}>&lt;</button> `);
 				h.push(`<select id="gbg-select-gbground">`);
 
@@ -345,11 +331,9 @@ let GuildFights = {
 				h.push(`<button class="btn btn-set-week last" data-week="${nextweek}"${nextweek === null ? ' disabled' : ''}>&gt;</button>`);
 			}
 
-			if (gbground === GuildFights.CurrentGBGRound)
-			{
+			if (gbground === GuildFights.CurrentGBGRound) {
 				h.push(`<div id="gbgLogFilter">`);
-				if (GuildFights.PlayerBoxSettings.showProgressFilter === 1)
-				{
+				if (GuildFights.PlayerBoxSettings.showProgressFilter === 1) {
 					h.push(`<button id="gbg_filterProgressList" title="${HTML.i18nTooltip(i18n('Boxes.GuildFights.ProgressFilterDesc'))}" class="btn" disabled>&#8593;</button>`);
 				}
 
@@ -414,10 +398,8 @@ let GuildFights = {
 		let nelem = elem.find('tr.new');
 		let act = $('#' + id).hasClass('filtered') ? 'show' : 'hide';
 
-		if (act === 'hide')
-		{
-			if (nelem.length !== 0)
-			{
+		if (act === 'hide') {
+			if (nelem.length !== 0) {
 				let oelem = elem.find('tr:not(.new)');
 				GuildFights.PlayerBoxSettings.showOnlyActivePlayers = 1;
 				localStorage.setItem('GuildFightsPlayerBoxSettings', JSON.stringify(GuildFights.PlayerBoxSettings));
@@ -427,8 +409,7 @@ let GuildFights = {
 			}
 		}
 
-		else if (act === 'show')
-		{
+		else if (act === 'show') {
 			elem.find('tr').show();
 			GuildFights.PlayerBoxSettings.showOnlyActivePlayers = 0;
 			localStorage.setItem('GuildFightsPlayerBoxSettings', JSON.stringify(GuildFights.PlayerBoxSettings));
@@ -462,10 +443,10 @@ let GuildFights = {
 	GetAlertButton: (provId) => {
 		let btn;
 		if (GuildFights.Alerts.find((a) => a.provId == provId) !== undefined) {
-			btn = `<button class="btn btn-slim btn-delete deletealertbutton" data-id="${provId}">${i18n('Boxes.GuildFights.DeleteAlert')}</button>`;
+			btn = `<button class="btn btn-slim btn-delete deletealertbutton" data-id="${provId}" data-original-title="${i18n('Boxes.GuildFights.DeleteAlert')}"></button>`;
 		}
 		else {
-			btn = `<button class="btn btn-slim setalertbutton" data-id="${provId}">${i18n('Boxes.GuildFights.SetAlert')}</button>`;
+			btn = `<button class="btn btn-slim setalertbutton" data-id="${provId}" data-original-title="${i18n('Boxes.GuildFights.SetAlert')}"></button>`;
 		}
 		return btn;
 	},
@@ -490,8 +471,7 @@ let GuildFights = {
 			// add css to the dom
 			HTML.AddCssFile('guildfights');
 		}
-		else if (!reload)
-		{
+		else if (!reload) {
 			HTML.CloseOpenBox('LiveGildFighting');
 			return;
 		}
@@ -557,8 +537,7 @@ let GuildFights = {
 
 
 	/**
-	 * Build the player content content
-	 * @param gbground
+	 * Build the player content
 	 * @returns {Promise<void>}
 	 */
 	BuildPlayerContent: async (gbground) => {
@@ -804,8 +783,6 @@ let GuildFights = {
 
 
 	/**
-	 *
-	 * @param d
 	 * @returns {Promise<void>}
 	 */
 	BuildDetailViewContent: async (d) => {
@@ -949,7 +926,6 @@ let GuildFights = {
 
 
 	/**
-	 * @param gbground
 	 * @returns {Promise<void>}
 	 */
 	DeleteOldSnapshots: async (gbground) => {
@@ -958,7 +934,6 @@ let GuildFights = {
 
 
 	/**
-	 * @param data
 	 * @returns {Promise<void>}
 	 */
 	BuildDetailViewLog: async (data) => {
@@ -1037,10 +1012,10 @@ let GuildFights = {
 		let h = [];
 
 		h.push(`<div class="btn-group">
-			<button class="btn copybutton all" onclick="GuildFights.CopyToClipBoard(event)">${i18n('Boxes.GuildFights.SelectAll')}</button>
-			<button class="btn dcbutton discord custom" onclick="GuildFights.PrepareForDiscord(event)" data-original-title="${i18n('Boxes.GuildFights.DiscordSendSelectionCustom')}" style="display:none;"></button>
-			<button class="btn dcbutton discord" onclick="GuildFights.PrepareForDiscord(event)" data-original-title="${i18n('Boxes.GuildFights.DiscordSendSelection')}" style="display:none;"></button>
-			<button class="btn mapbutton" onclick="ProvinceMap.build()">${i18n('Boxes.GuildFights.OpenMap')}</button>
+			<button class="btn btn-slim copybutton all" onclick="GuildFights.CopyToClipBoard(event)">${i18n('Boxes.GuildFights.SelectAll')}</button>
+			<button class="btn btn-slim dcbutton discord custom" onclick="GuildFights.PrepareForDiscord(event)" data-original-title="${i18n('Boxes.GuildFights.DiscordSendSelectionCustom')}" style="display:none;"></button>
+			<button class="btn btn-slim dcbutton discord" onclick="GuildFights.PrepareForDiscord(event)" data-original-title="${i18n('Boxes.GuildFights.DiscordSendSelection')}" style="display:none;"></button>
+			<button class="btn btn-slim mapbutton" onclick="ProvinceMap.build()">${i18n('Boxes.GuildFights.OpenMap')}</button>
 			</div>
 		</div>`);
 		h.push('<div class="gbg-tabs tabs">');
@@ -1066,13 +1041,7 @@ let GuildFights = {
 				e.stopPropagation();
 			});
 			$('#nextup').on('click', 'tr', function () {
-				if ($(this).hasClass('highlight-row'))
-				{
-					$(this).removeClass('highlight-row');
-				}
-				else {
-					$(this).addClass('highlight-row');
-				}
+				$(this).toggleClass('highlight-row');
 				GuildFights.ToggleCopyButton();
 			});
 		});
@@ -1097,18 +1066,13 @@ let GuildFights = {
 		progress.push('</tr></thead><tbody>');
 
 		for (let i in mapdata) {
-			if (!mapdata.hasOwnProperty(i)) 
-				break;
-
-			let id = mapdata[i]['id'] || 0;
+			if (!mapdata.hasOwnProperty(i)) break;
+			let id = mapdata[i].id || 0;
 
 			for (let x in gbgGuilds) {
-				if (!gbgGuilds.hasOwnProperty(x)) {
-					break;
-				}
+				if (!gbgGuilds.hasOwnProperty(x)) break;
 
-				if (mapdata[i]['ownerId'] !== undefined && gbgGuilds[x]['participantId'] === mapdata[i]['ownerId']) {
-					// show current fights
+				if (mapdata[i].ownerId !== undefined && gbgGuilds[x].participantId === mapdata[i].ownerId) {
 					if (mapdata[i]['conquestProgress'].length > 0 && (mapdata[i]['lockedUntil'] === undefined)) {
 						let pColor = ProvinceMap.getSectorColors(mapdata[i]['ownerId']);
 						let provinceProgress = mapdata[i]['conquestProgress'];
@@ -1122,9 +1086,7 @@ let GuildFights = {
 						progress.push(`<td data-field="${id}-${mapdata[i]['ownerId']}" class="guild-progress">`);
 
 						for (let y in provinceProgress) {
-							if (!provinceProgress.hasOwnProperty(y)) {
-								break;
-							}
+							if (!provinceProgress.hasOwnProperty(y)) break;
 
 							let color = ProvinceMap.getSectorColors(provinceProgress[y]['participantId']);
 							progress.push(`<span class="attack attacker-${provinceProgress[y]['participantId']} gbg-${color['cid']}">${provinceProgress[y]['progress']}</span>`);
@@ -1148,12 +1110,9 @@ let GuildFights = {
 				let provinceProgress = mapdata[i]['conquestProgress'];
 
 				for (let y in provinceProgress) {
-					if (!provinceProgress.hasOwnProperty(y)) {
-						break;
-					}
+					if (!provinceProgress.hasOwnProperty(y)) break;
 
 					let color = GuildFights.SortedColors.find(e => e['id'] === provinceProgress[y]['participantId']);
-
 					progress.push(`<span class="attack attacker-${provinceProgress[y]['participantId']} gbg-${color['cid']}">${provinceProgress[y]['progress']}</span>`);
 				}
 
@@ -1172,7 +1131,7 @@ let GuildFights = {
 		let nextup = [],
 			mapdata = GuildFights.MapData.map.provinces,
 			gbgGuilds = GuildFights.MapData['battlegroundParticipants'],
-			own = gbgGuilds.find(e => e['clan']['id'] === ExtGuildID),
+			own = gbgGuilds.find(e => e.clan.id === ExtGuildID),
 			LiveFightSettings = JSON.parse(localStorage.getItem('LiveFightSettings'));
 
 		GuildFights.showAdjacentSectors = (LiveFightSettings && LiveFightSettings.showAdjacentSectors !== undefined) ? LiveFightSettings.showAdjacentSectors : 1;
@@ -1186,8 +1145,10 @@ let GuildFights = {
 			nextup.push('<th>' + i18n('Boxes.GuildFights.Owner') + '</th>');
 		
 		nextup.push(`<th class="time-static w-small">${i18n('Boxes.GuildFights.Time')}</th>
-				<th class="time-dynamic w-small">${i18n('Boxes.GuildFights.Count')}</th>
-				<th></th>
+				<th class="time-dynamic w-small">${i18n('Boxes.GuildFights.Count')}</th>`);
+				if (GuildFights.discordWebhook.url != '')
+					nextup.push(`<th></th>`);
+				nextup.push(`<th></th>
 			</tr></thead>`);
 
 		let arrayprov = [];
@@ -1201,7 +1162,7 @@ let GuildFights = {
 				ownsectors = (own.clan.name !== mapdata[i].owner);
 
 			if (mapdata[i].lockedUntil !== undefined && ownsectors)
-				arrayprov.push(mapdata[i]);  // push all datas into array
+				arrayprov.push(mapdata[i]);  // push all data into array
 		}
 
 		let prov = arrayprov.sort((a, b) => { return a.lockedUntil - b.lockedUntil });
@@ -1210,53 +1171,75 @@ let GuildFights = {
 			if (!prov.hasOwnProperty(x)) continue;
 
 			let showCountdowns = true;
-			if (GuildFights.showAdjacentSectors)
-				if (!prov[x].hasOwnProperty('neighbor')) {
+			if (GuildFights.showAdjacentSectors) {
+				if (!prov[x].hasOwnProperty('neighbor')) 
 					showCountdowns = false;
-				} else
-					showCountdowns = (prov[x]['neighbor'].includes(own['participantId']) || (prov[x]['owner'] == own.clan.name && GuildFights.showOwnSectors));
+				else
+					showCountdowns = (prov[x].neighbor.includes(own.participantId) || (prov[x].owner == own.clan.name && GuildFights.showOwnSectors));
+			}
 
 			if (showCountdowns) {
-				let countDownDate = moment.unix(prov[x]['lockedUntil'] - 2),
+				let countDownDate = moment.unix(prov[x].lockedUntil - 2),
 					color = GuildFights.SortedColors.find(e => e.id === prov[x].ownerId),
 					battleType = prov[x].isAttackBattleType ? 'BTattack' : 'BTdefence',
 					intervalID = setInterval(() => {
 						GuildFights.UpdateCounter(countDownDate, intervalID, prov[x].id);
 					}, 1000);
 
-				nextup.push(`<tr id="timer-${prov[x].id}" class="timer" data-tab="nextup" data-id=${prov[x].id}>
-					<td class="prov-name" title="${i18n('Boxes.GuildFights.Owner')}: ${prov[x].owner}">
+				
+				// look for connecting province timers
+				let connectionSecured = false;
+				for (const link of ProvinceMap.ProvinceData()[prov[x].id].connections) {
+					if (prov[x].owner == own.clan.name) continue;
+					
+					let ownNeighboringProvinces = mapdata.filter(x => x.id === link && x.ownerId === own.participantId);
+					for (const nProv of ownNeighboringProvinces) {
+						if (nProv.isSpawnSpot) {
+							connectionSecured = true;
+							break;
+						}
+
+						if ((nProv.lockedUntil||0) < prov[x].lockedUntil) continue;
+
+						connectionSecured = true;
+						break;
+					}
+				}
+				
+				nextup.push(`<tr id="timer-${prov[x].id}" class="timer ${connectionSecured ? 'secure' : ''}" data-tab="nextup" data-id=${prov[x].id}>
+					<td class="prov-name" data-original-title="${i18n('Boxes.GuildFights.Owner')}: ${prov[x].owner}">
 					<span class="province-color" ${color['main'] ? 'style="background-color:' + color['main'] + '"' : ''}"></span>
 					<span class="battletype ${battleType}"></span>
-					<b>${prov[x]['title']}</b> 
+					<b>${prov[x].title}</b> 
 					</td>`);
 
 				GuildFights.UpdateCounter(countDownDate, intervalID, prov[x].id);
 
-				if (GuildFights.showGuildColumn) {
+				if (GuildFights.showGuildColumn) 
 					nextup.push(`<td>${prov[x].owner}</td>`);
-				}
 
 				let timeAt = moment(countDownDate).add(LiveFightSettings?.showServerTime ? - 60 * (GuildFights.serverOffset ?? 0) : 0 , "seconds");
 				nextup.push(`<td class="time-static" style="user-select:text">${timeAt.format('HH:mm:ss')}</td>
 							<td class="time-dynamic" id="counter-${prov[x].id}">${countDownDate.format('HH:mm:ss')}</td>`);
 
-				let discordButton = '';
-				let isUnder60Min = ((prov[x]['lockedUntil'] - Math.round(Date.now() / 1000)) / 60) < 60;
-
-				if (prov[x]['owner'] !== own.clan.name && isUnder60Min && GuildFights.discordWebhook.url != '') {
+				let discordButtons = '';
+				if (prov[x].owner !== own.clan.name && GuildFights.discordWebhook.url != '') {
 					if (GuildFights.discordWebhook.template != '') {
 						let tpl = Discord.WebHooks.find(x => x.name == GuildFights.discordWebhook.template);
 						if (tpl)
-							discordButton += `<button class="btn btn-slim discord custom" data-original-title="${i18n('Boxes.GuildFights.DiscordSendCustom')}" onclick="Discord.sendGBGSectorCustom(${prov[x]['id']});"></button>`;
+							discordButtons += `<button class="btn btn-slim discord custom" data-original-title="${i18n('Boxes.GuildFights.DiscordSendCustom')}" onclick="Discord.sendGBGSectorCustom(${prov[x]['id']});"></button>`;
 					}
-					discordButton += `<button class="btn btn-slim discord" data-original-title="${i18n('Boxes.GuildFights.DiscordSend')}" onclick="Discord.sendGBGSector(${prov[x]['id']});"></button>`;
+					discordButtons += `<button class="btn btn-slim discord" data-original-title="${i18n('Boxes.GuildFights.DiscordSend')}" onclick="Discord.sendGBGSector(${prov[x]['id']});"></button>`;
 				}
 
-				nextup.push(`<td class="text-right" id="alert-${prov[x]['id']}">
+				nextup.push(`<td class="text-right">
 					<div class="btn-group">
-					${discordButton}
-					${GuildFights.GetAlertButton(prov[x]['id'])}</div></td>`);
+					${discordButtons}
+					</div></td>`);
+
+				nextup.push(`<td class="text-right" id="alert-${prov[x]['id']}">
+					${GuildFights.GetAlertButton(prov[x].id)}
+					</div></td>`);
 				nextup.push('</tr>');
 			}
 		}
@@ -1531,9 +1514,7 @@ let GuildFights = {
 	 * Real time update of the map box
 	 */
 	RefreshTable: (data) => {
-
-		// Province is locked
-		if (data['lockedUntil']) {
+		if (data.lockedUntil) {
 			let $province = $(`#province-${data['id']}`),
 				elements = $province.find('.attack').length;
 
@@ -1722,6 +1703,7 @@ let GuildFights = {
 		}).then((aId) => {
 			GuildFights.Alerts.push({ provId: id, alertId: aId });
 			$(`#alert-${id}`).html(GuildFights.GetAlertButton(id));
+			$('.tooltip').remove();
 			HTML.ShowToastMsg({
 				head: i18n('Boxes.GuildFights.SaveMessage.Title'),
 				text: HTML.i18nReplacer(i18n('Boxes.GuildFights.SaveMessage.Desc'), { provinceName: prov.title }),
@@ -1729,7 +1711,6 @@ let GuildFights = {
 				hideAfter: 5000
 			});
 		});
-
 	},
 
 
@@ -1864,7 +1845,6 @@ let GuildFights = {
 };
 
 let ProvinceMap = {
-
 	Map: {},
 	MapCTX: {},
 
