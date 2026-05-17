@@ -37,10 +37,10 @@ let BuildingTracker = {
 	Config: {
 		GreatBuildings: [
 			'X_FutureEra_Landmark1',
+			'X_AllAge_Expedition',
 			'X_ProgressiveEra_Landmark2',
 			'X_OceanicFuture_Landmark3',
 			'X_ArcticFuture_Landmark3',
-			'X_AllAge_Expedition'
 		],
 		EasterBonus: {
 			icon: 'W_AllAge_EasterBonus1',
