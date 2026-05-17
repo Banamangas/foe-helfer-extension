@@ -128,8 +128,16 @@ let BuildingTracker = {
 
 		let html = '<div class="bt-header">' +
 			'<span class="bt-title">' + i18n('Boxes.BuildingTracker.Title') + '</span>' +
-			'<span class="bt-copy-btn" title="Copy values to clipboard">' +
-				'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
+			'<span class="bt-copy-btns">' +
+				'<span class="bt-copy-btn" data-target="gbs" title="Copy GB levels">' +
+					'<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
+				'</span>' +
+				'<span class="bt-copy-btn" data-target="city" title="Copy city buildings">' +
+					'<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
+				'</span>' +
+				'<span class="bt-copy-btn" data-target="inventory" title="Copy inventory">' +
+					'<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
+				'</span>' +
 			'</span>' +
 			'<span class="bt-diamond-badge" data-count="0">' +
 				'<img src="' + srcLinks.get('/shared/icons/premium.png', true) + '" alt="" />' +
@@ -144,7 +152,7 @@ let BuildingTracker = {
 		$tracker.html(html);
 
 		$('#building-tracker .bt-copy-btn').on('click', function () {
-			BuildingTracker.copyToClipboard();
+			BuildingTracker.copyToClipboard($(this).data('target'));
 		});
 
 		// Diamond badge click opens Productions module on premium tab
@@ -298,44 +306,23 @@ let BuildingTracker = {
 
 
 	/**
-	 * Copy building data as HTML table for Excel paste with gaps
+	 * Copy building data as plain text for Excel paste
+	 * @param {string} target - 'gbs', 'city', or 'inventory'
 	 */
-	copyToClipboard: () => {
+	copyToClipboard: (target) => {
 		let data = BuildingTracker.gatherData();
 
-		let rows = [];
-
-		data.gbs.forEach(gb => {
-			rows.push(gb.level);
-		});
-
-		rows.push('');
-
-		data.cityBuildings.forEach(b => {
-			rows.push(b.city);
-		});
-
-		for (let i = 0; i < 10; i++) {
-			rows.push('');
+		let values;
+		if (target === 'gbs') {
+			values = data.gbs.map(gb => gb.level).join('\n');
+		} else if (target === 'city') {
+			values = data.cityBuildings.map(b => b.city).join('\n');
+		} else if (target === 'inventory') {
+			values = data.cityBuildings.map(b => b.inventory).join('\n');
 		}
 
-		data.cityBuildings.forEach(b => {
-			rows.push(b.inventory);
-		});
-
-		let htmlTable = '<table>' + rows.map(v => '<tr><td>' + v + '</td></tr>').join('') + '</table>';
-		let plainText = rows.join('\n');
-
-		let blobHtml = new Blob([htmlTable], { type: 'text/html' });
-		let blobText = new Blob([plainText], { type: 'text/plain' });
-
-		let item = new ClipboardItem({
-			'text/html': blobHtml,
-			'text/plain': blobText,
-		});
-
-		navigator.clipboard.write([item]).then(() => {
-			let $btn = $('#building-tracker .bt-copy-btn');
+		navigator.clipboard.writeText(values).then(() => {
+			let $btn = $(`#building-tracker .bt-copy-btn[data-target="${target}"]`);
 			$btn.addClass('bt-copied');
 			setTimeout(() => $btn.removeClass('bt-copied'), 1200);
 		});

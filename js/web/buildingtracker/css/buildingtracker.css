@@ -131,12 +131,18 @@
 	font-weight: bold;
 }
 
+.bt-copy-btns {
+	display: flex;
+	gap: 4px;
+	align-items: center;
+}
+
 .bt-copy-btn {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 22px;
-	height: 22px;
+	width: 20px;
+	height: 20px;
 	border: 1px solid #8c6b3f;
 	border-radius: 3px;
 	background: rgba(0, 0, 0, 0.3);
