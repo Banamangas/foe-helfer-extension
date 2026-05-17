@@ -128,6 +128,9 @@ let BuildingTracker = {
 
 		let html = '<div class="bt-header">' +
 			'<span class="bt-title">' + i18n('Boxes.BuildingTracker.Title') + '</span>' +
+			'<span class="bt-copy-btn" title="Copy values to clipboard">' +
+				'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
+			'</span>' +
 			'<span class="bt-diamond-badge" data-count="0">' +
 				'<img src="' + srcLinks.get('/shared/icons/premium.png', true) + '" alt="" />' +
 				'<span class="bt-count">0</span>' +
@@ -139,6 +142,10 @@ let BuildingTracker = {
 		'</div>';
 
 		$tracker.html(html);
+
+		$('#building-tracker .bt-copy-btn').on('click', function () {
+			BuildingTracker.copyToClipboard();
+		});
 
 		// Diamond badge click opens Productions module on premium tab
 		$('#building-tracker .bt-diamond-badge').on('click', function () {
@@ -173,17 +180,15 @@ let BuildingTracker = {
 	 * Update Great Building levels — 5-column icon grid
 	 */
 	updateGreatBuildings: () => {
+		let data = BuildingTracker.gatherData();
 		let html = '';
-		let cityData = Object.values(MainParser.CityMapData);
 
-		BuildingTracker.Config.GreatBuildings.forEach(gbId => {
-			let gb = cityData.find(b => b.cityentity_id === gbId && b.type === 'greatbuilding');
-			let level = gb ? gb.level : 0;
-			let iconUrl = BuildingTracker.getBuildingIconUrl(gbId);
+		data.gbs.forEach(gb => {
+			let iconUrl = BuildingTracker.getBuildingIconUrl(gb.id);
 
 			html += '<div class="bt-gb-item">' +
-				'<img class="bt-icon" src="' + iconUrl + '" alt="" title="' + (MainParser.CityEntities[gbId]?.name || gbId) + '" />' +
-				'<span class="bt-gb-lvl">' + level + '</span>' +
+				'<img class="bt-icon" src="' + iconUrl + '" alt="" title="' + gb.name + '" />' +
+				'<span class="bt-gb-lvl">' + gb.level + '</span>' +
 				'</div>';
 		});
 
@@ -195,62 +200,23 @@ let BuildingTracker = {
 	 * Update regular building counts — 3-column icon grid with aggregated counts
 	 */
 	updateRegularBuildings: () => {
+		let data = BuildingTracker.gatherData();
 		let html = '';
-		let cityData = Object.values(MainParser.CityMapData);
-		let inventory = Object.values(MainParser.Inventory);
 
-		// Calculate special kit bonus for SummerBonus
-		let specialKitCount = inventory
-			.filter(item => {
-				let kitId = item.item?.selectionKitId || item.item?.upgradeItemId;
-				return BuildingTracker.Config.SummerBonus.specialKitIds.includes(kitId);
-			})
-			.reduce((sum, item) => sum + (item.inStock || 0), 0);
+		data.cityBuildings.forEach(b => {
+			let iconId = b.name === 'Easter Bonus'
+				? BuildingTracker.Config.EasterBonus.icon
+				: b.name === 'Expedition'
+					? BuildingTracker.Config.Expedition.icon
+					: BuildingTracker.Config.SummerBonus.icon;
 
-		let bonusBuildings = Math.floor(specialKitCount / BuildingTracker.Config.SummerBonus.kitsPerBuilding);
+			let iconUrl = BuildingTracker.getBuildingIconUrl(iconId);
 
-		// EasterBonus aggregate
-		let easterCity = 0, easterInv = 0;
-		BuildingTracker.Config.EasterBonus.ids.forEach(id => {
-			easterCity += cityData.filter(b => b.cityentity_id === id).length;
-			easterInv += inventory
-				.filter(item => item.item?.cityEntityId === id)
-				.reduce((sum, item) => sum + (item.inStock || 0), 0);
+			html += '<div class="bt-building-item">' +
+				'<img class="bt-icon" src="' + iconUrl + '" alt="" title="' + b.name + '" />' +
+				'<span class="bt-building-count">' + b.city + ' (' + b.inventory + ')</span>' +
+				'</div>';
 		});
-
-		let easterIcon = BuildingTracker.getBuildingIconUrl(BuildingTracker.Config.EasterBonus.icon);
-		html += '<div class="bt-building-item">' +
-			'<img class="bt-icon" src="' + easterIcon + '" alt="" title="Easter Bonus" />' +
-			'<span class="bt-building-count">' + easterCity + ' (' + easterInv + ')</span>' +
-			'</div>';
-
-		// Expedition aggregate
-		let expeditionCity = 0, expeditionInv = 0;
-		BuildingTracker.Config.Expedition.ids.forEach(id => {
-			expeditionCity += cityData.filter(b => b.cityentity_id === id).length;
-			expeditionInv += inventory
-				.filter(item => item.item?.cityEntityId === id)
-				.reduce((sum, item) => sum + (item.inStock || 0), 0);
-		});
-
-		let expeditionIcon = BuildingTracker.getBuildingIconUrl(BuildingTracker.Config.Expedition.icon);
-		html += '<div class="bt-building-item">' +
-			'<img class="bt-icon" src="' + expeditionIcon + '" alt="" title="Expedition" />' +
-			'<span class="bt-building-count">' + expeditionCity + ' (' + expeditionInv + ')</span>' +
-			'</div>';
-
-		// SummerBonus (with kit bonus added to inventory)
-		let summerCity = cityData.filter(b => b.cityentity_id === BuildingTracker.Config.SummerBonus.ids[0]).length;
-		let summerInv = inventory
-			.filter(item => item.item?.cityEntityId === BuildingTracker.Config.SummerBonus.ids[0])
-			.reduce((sum, item) => sum + (item.inStock || 0), 0);
-		summerInv += bonusBuildings;
-
-		let summerIcon = BuildingTracker.getBuildingIconUrl(BuildingTracker.Config.SummerBonus.icon);
-		html += '<div class="bt-building-item">' +
-			'<img class="bt-icon" src="' + summerIcon + '" alt="" title="Summer Bonus" />' +
-			'<span class="bt-building-count">' + summerCity + ' (' + summerInv + ')</span>' +
-			'</div>';
 
 		$('#building-tracker .bt-buildings').html(html);
 	},
@@ -273,6 +239,106 @@ let BuildingTracker = {
 		} else {
 			$menuCounter.hide();
 		}
+	},
+
+
+	/**
+	 * Gather all building data for display and clipboard
+	 */
+	gatherData: () => {
+		let cityData = Object.values(MainParser.CityMapData);
+		let inventory = Object.values(MainParser.Inventory);
+
+		let specialKitCount = inventory
+			.filter(item => {
+				let kitId = item.item?.selectionKitId || item.item?.upgradeItemId;
+				return BuildingTracker.Config.SummerBonus.specialKitIds.includes(kitId);
+			})
+			.reduce((sum, item) => sum + (item.inStock || 0), 0);
+
+		let bonusBuildings = Math.floor(specialKitCount / BuildingTracker.Config.SummerBonus.kitsPerBuilding);
+
+		let gbs = BuildingTracker.Config.GreatBuildings.map(gbId => {
+			let gb = cityData.find(b => b.cityentity_id === gbId && b.type === 'greatbuilding');
+			let level = gb ? gb.level : 0;
+			let name = MainParser.CityEntities[gbId]?.name || gbId;
+			return { id: gbId, name, level };
+		});
+
+		let easterCity = 0, easterInv = 0;
+		BuildingTracker.Config.EasterBonus.ids.forEach(id => {
+			easterCity += cityData.filter(b => b.cityentity_id === id).length;
+			easterInv += inventory
+				.filter(item => item.item?.cityEntityId === id)
+				.reduce((sum, item) => sum + (item.inStock || 0), 0);
+		});
+
+		let expeditionCity = 0, expeditionInv = 0;
+		BuildingTracker.Config.Expedition.ids.forEach(id => {
+			expeditionCity += cityData.filter(b => b.cityentity_id === id).length;
+			expeditionInv += inventory
+				.filter(item => item.item?.cityEntityId === id)
+				.reduce((sum, item) => sum + (item.inStock || 0), 0);
+		});
+
+		let summerCity = cityData.filter(b => b.cityentity_id === BuildingTracker.Config.SummerBonus.ids[0]).length;
+		let summerInv = inventory
+			.filter(item => item.item?.cityEntityId === BuildingTracker.Config.SummerBonus.ids[0])
+			.reduce((sum, item) => sum + (item.inStock || 0), 0);
+		summerInv += bonusBuildings;
+
+		let cityBuildings = [
+			{ name: 'Easter Bonus', city: easterCity, inventory: easterInv },
+			{ name: 'Expedition', city: expeditionCity, inventory: expeditionInv },
+			{ name: 'Summer Bonus', city: summerCity, inventory: summerInv },
+		];
+
+		return { gbs, cityBuildings };
+	},
+
+
+	/**
+	 * Copy building data as HTML table for Excel paste with gaps
+	 */
+	copyToClipboard: () => {
+		let data = BuildingTracker.gatherData();
+
+		let rows = [];
+
+		data.gbs.forEach(gb => {
+			rows.push(gb.level);
+		});
+
+		rows.push('');
+
+		data.cityBuildings.forEach(b => {
+			rows.push(b.city);
+		});
+
+		for (let i = 0; i < 10; i++) {
+			rows.push('');
+		}
+
+		data.cityBuildings.forEach(b => {
+			rows.push(b.inventory);
+		});
+
+		let htmlTable = '<table>' + rows.map(v => '<tr><td>' + v + '</td></tr>').join('') + '</table>';
+		let plainText = rows.join('\n');
+
+		let blobHtml = new Blob([htmlTable], { type: 'text/html' });
+		let blobText = new Blob([plainText], { type: 'text/plain' });
+
+		let item = new ClipboardItem({
+			'text/html': blobHtml,
+			'text/plain': blobText,
+		});
+
+		navigator.clipboard.write([item]).then(() => {
+			let $btn = $('#building-tracker .bt-copy-btn');
+			$btn.addClass('bt-copied');
+			setTimeout(() => $btn.removeClass('bt-copied'), 1200);
+		});
 	},
 
 

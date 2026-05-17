@@ -130,3 +130,28 @@
 	color: #e0d0b0;
 	font-weight: bold;
 }
+
+.bt-copy-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 22px;
+	height: 22px;
+	border: 1px solid #8c6b3f;
+	border-radius: 3px;
+	background: rgba(0, 0, 0, 0.3);
+	cursor: pointer;
+	color: #e0d0b0;
+	transition: background 0.15s, color 0.15s;
+}
+
+.bt-copy-btn:hover {
+	background: rgba(140, 107, 63, 0.4);
+	color: #f0e0c0;
+}
+
+.bt-copy-btn.bt-copied {
+	background: #33cc33;
+	border-color: #33cc33;
+	color: #fff;
+}
