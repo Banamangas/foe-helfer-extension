@@ -1027,7 +1027,6 @@ let GuildFights = {
 
 		$('#LiveGildFighting').find('#LiveGildFightingBody').html(h.join('')).promise().done(function () {
 			$('.gbg-tabs').tabslet({ active: activeTab });
-			$('[data-original-title]').tooltip({container: 'body'});
 
 			$('.gbg-tabs').on('_after', (e) => {
 				GuildFights.ToggleCopyButton();
@@ -1044,6 +1043,7 @@ let GuildFights = {
 				$(this).toggleClass('highlight-row');
 				GuildFights.ToggleCopyButton();
 			});
+			$('[data-original-title]').tooltip({container: 'body'});
 		});
 	},
 
@@ -1274,7 +1274,9 @@ let GuildFights = {
 					GuildFights.UpdateCounter(countDownDate, intervalID, province.id);
 				}, 1000);
 
-			content.push(`<tr id="time-${province.id}" class="time ${(province.usedBuildingSlots||0) < province.totalBuildingSlots ? 'bg-red':''}" data-tab="gbgowned" data-id=${province.id}>
+			let slotWarning = (province.usedBuildingSlots||0) < province.totalBuildingSlots && province.totalBuildingSlots === 2 ? 'bg-red': ((province.usedBuildingSlots||0) < province.totalBuildingSlots ? 'bg-yellow' : '')
+
+			content.push(`<tr id="time-${province.id}" class="time ${slotWarning}" data-tab="gbgowned" data-id=${province.id}>
 				<td class="prov-name" title="${i18n('Boxes.GuildFights.Owner')}: ${province.owner}">
 					<span class="province-color" ${color['main'] ? 'style="background-color:' + color['main'] + '"' : ''}"></span> 
 					<b>${province.title}</b> 
@@ -1723,6 +1725,7 @@ let GuildFights = {
 			id: alert.alertId,
 		}).then(() => {
 			GuildFights.Alerts = GuildFights.Alerts.filter((a) => a.provId != provId);
+			$('.tooltip').remove();
 			HTML.ShowToastMsg({
 				head: i18n('Boxes.GuildFights.DeleteMessage.Title'),
 				text: HTML.i18nReplacer(i18n('Boxes.GuildFights.DeleteMessage.Desc'), { provinceName: prov.title }),
